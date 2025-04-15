@@ -10,12 +10,51 @@ import {
 } from "lucide-react";
 import NavBar from "./components/Navbar";
 import Footer from "./components/Footer";
-import axios from "axios";
+
+function sanitizeSVG(svgString: string) {
+  // 1.  HTML Entity Encoding (Basic)
+  svgString = svgString
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+
+  // 2. Remove Comments (More robust)
+  svgString = svgString.replace(/<!--[\s\S]*?-->/g, "");
+
+  // 3. Remove or Escape Unsafe Attributes (Example: script)
+  svgString = svgString.replace(
+    /<[^>]*\s(onload|onerror|onclick|on\w+)\s*=\s*['"][^'"]*['"][^>]*>/gi,
+    ""
+  );
+  svgString = svgString.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "");
+
+  // 4.  CSS Sanitization (basic - more complex would need CSS parser)
+  svgString = svgString.replace(/style="[^"]*"/gi, (match) => {
+    let sanitizedStyle = match.replace(/expression\s*:/gi, "SAFE_EXPRESSION:"); // try to neutralize expressions
+    sanitizedStyle = sanitizedStyle.replace(/url\s*\(/gi, "SAFE_URL(");
+    return sanitizedStyle;
+  });
+
+  return svgString;
+}
+
+function decodeSVG(svgString: string) {
+  // Use a regular expression to find HTML entities and UTF-8 character codes
+  return svgString
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&#(\d+);/g, (match, numStr) => {
+      const num = parseInt(numStr, 10);
+      return String.fromCharCode(num);
+    });
+}
 
 function App() {
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
   const [svgPath, setSvgPath] = useState("");
+  const [svgUrl, setSvgUrl] = useState("");
   const [error, setError] = useState("");
   const [showGenerator, setShowGenerator] = useState(false);
 
@@ -34,17 +73,19 @@ function App() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ userinput: prompt }),
-          mode: "no-cors",
         }
       );
 
       console.log("response => ", response);
-      if (!response?.ok) throw new Error("Failed to generate icon");
+      // if (!response?.ok) throw new Error("Failed to generate icon");
 
       const data = await response.json();
-      console.log("data string => ", data);
+      const sanitize = sanitizeSVG(data?.data?.svg);
+      // console.log("svg sanitized => ", sanitize);
 
-      // setSvgPath(data.svgPath);
+      // if (!sanitize) throw new Error("Failed to generate icon")
+      setSvgPath(sanitize);
+      setSvgUrl(data?.data?.url);
     } catch (err) {
       console.log("error => ", err);
       setError("Failed to generate icon. Please try again.");
@@ -258,14 +299,21 @@ function App() {
               {svgPath && !loading && (
                 <div className="flex flex-col items-center gap-4">
                   <div className="w-32 h-32 bg-white/5 rounded-xl p-4 flex items-center justify-center">
-                    <div
+                    {/* <div
                       dangerouslySetInnerHTML={{ __html: svgPath }}
+                      className="w-full h-full"
+                    /> */}
+                    <img
+                      src={svgUrl}
+                      alt="generated image"
                       className="w-full h-full"
                     />
                   </div>
                   <button
                     onClick={() => {
-                      const blob = new Blob([svgPath], {
+                      const decoded = decodeSVG(svgPath);
+
+                      const blob = new Blob([decoded], {
                         type: "image/svg+xml",
                       });
                       const url = URL.createObjectURL(blob);
