@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import {
   Sparkles,
   Loader2,
-  Rocket,
   Palette,
   Download,
   Zap,
@@ -10,45 +9,7 @@ import {
 } from "lucide-react";
 import NavBar from "./components/Navbar";
 import Footer from "./components/Footer";
-
-function sanitizeSVG(svgString: string) {
-  // 1.  HTML Entity Encoding (Basic)
-  svgString = svgString
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-
-  // 2. Remove Comments (More robust)
-  svgString = svgString.replace(/<!--[\s\S]*?-->/g, "");
-
-  // 3. Remove or Escape Unsafe Attributes (Example: script)
-  svgString = svgString.replace(
-    /<[^>]*\s(onload|onerror|onclick|on\w+)\s*=\s*['"][^'"]*['"][^>]*>/gi,
-    ""
-  );
-  svgString = svgString.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "");
-
-  // 4.  CSS Sanitization (basic - more complex would need CSS parser)
-  svgString = svgString.replace(/style="[^"]*"/gi, (match) => {
-    let sanitizedStyle = match.replace(/expression\s*:/gi, "SAFE_EXPRESSION:"); // try to neutralize expressions
-    sanitizedStyle = sanitizedStyle.replace(/url\s*\(/gi, "SAFE_URL(");
-    return sanitizedStyle;
-  });
-
-  return svgString;
-}
-
-function decodeSVG(svgString: string) {
-  // Use a regular expression to find HTML entities and UTF-8 character codes
-  return svgString
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&#(\d+);/g, (match, numStr) => {
-      const num = parseInt(numStr, 10);
-      return String.fromCharCode(num);
-    });
-}
+import { decodeSVG, sanitizeSVG } from "./utils/lib";
 
 function App() {
   const [prompt, setPrompt] = useState("");
@@ -76,16 +37,13 @@ function App() {
         }
       );
 
-      console.log("response => ", response);
-      // if (!response?.ok) throw new Error("Failed to generate icon");
-
       const data = await response.json();
-      const sanitize = sanitizeSVG(data?.data?.svg);
-      // console.log("svg sanitized => ", sanitize);
+      const image = data?.data?.images[0];
+      const sanitize = sanitizeSVG(image?.svg);
 
       // if (!sanitize) throw new Error("Failed to generate icon")
       setSvgPath(sanitize);
-      setSvgUrl(data?.data?.url);
+      setSvgUrl(image?.url);
     } catch (err) {
       console.log("error => ", err);
       setError("Failed to generate icon. Please try again.");

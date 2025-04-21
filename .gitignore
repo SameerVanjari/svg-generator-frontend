@@ -27,3 +27,6 @@ package-lock.json
 .bolt
 deno.lock
 pnpm-lock.yaml
+
+.env
+.env.*
