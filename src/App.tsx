@@ -10,6 +10,7 @@ import {
 import NavBar from "./components/Navbar";
 import Footer from "./components/Footer";
 import { decodeSVG, sanitizeSVG } from "./utils/lib";
+import OutlineTracer from "./components/OutlineTracer";
 
 function App() {
   const [prompt, setPrompt] = useState("");
@@ -254,7 +255,7 @@ function App() {
               {/* Result Section */}
               {error && <div className="text-red-400 text-sm">{error}</div>}
 
-              {svgPath && !loading && (
+              {svgUrl && !loading && (
                 <div className="flex flex-col items-center gap-4">
                   <div className="w-32 h-32 bg-white/5 rounded-xl p-4 flex items-center justify-center">
                     {/* <div
@@ -267,7 +268,7 @@ function App() {
                       className="w-full h-full"
                     />
                   </div>
-                  <button
+                  {/* <button
                     onClick={() => {
                       const decoded = decodeSVG(svgPath);
 
@@ -284,7 +285,9 @@ function App() {
                     className="text-sm px-4 py-2 bg-white/5 rounded-lg hover:bg-white/10 transition-colors"
                   >
                     Download SVG
-                  </button>
+                  </button> */}
+
+                  <OutlineTracer url={svgUrl} />
                 </div>
               )}
             </div>
