@@ -1,11 +1,9 @@
 import { Menu, Sparkles, X } from "lucide-react";
-import { SetStateAction, useState } from "react";
+import { useState } from "react";
 
-interface NavbarProps {
-  setShowGenerator: React.Dispatch<SetStateAction<boolean>>;
-}
+interface NavbarProps {}
 
-const NavBar: React.FC<NavbarProps> = ({ setShowGenerator }) => {
+const NavBar: React.FC<NavbarProps> = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
@@ -40,10 +38,10 @@ const NavBar: React.FC<NavbarProps> = ({ setShowGenerator }) => {
               Pricing
             </a>
             <button
-              onClick={() => setShowGenerator(true)}
+              onClick={() => (window.location.href = "/auth/register")}
               className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg font-medium hover:opacity-90 transition-opacity"
             >
-              Try Now
+              Register
             </button>
           </div>
 
@@ -85,12 +83,12 @@ const NavBar: React.FC<NavbarProps> = ({ setShowGenerator }) => {
             </a>
             <button
               onClick={() => {
-                setShowGenerator(true);
                 setMobileMenuOpen(false);
+                window.location.href = "/image-gen";
               }}
               className="w-full px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg font-medium hover:opacity-90 transition-opacity"
             >
-              Try Now
+              Register
             </button>
           </div>
         </div>
