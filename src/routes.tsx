@@ -20,15 +20,8 @@ function AppRoutes() {
           </Route>
           <Route path="/*" element={<Layout />}>
             <Route index element={<HomePage />} />
-            <Route
-              path="image-gen"
-              element={
-                <ProtectedRoute>
-                  <MainAppPage />
-                </ProtectedRoute>
-              }
-            />
           </Route>
+          <Route path="/image-gen" element={<MainAppPage />} />
 
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
