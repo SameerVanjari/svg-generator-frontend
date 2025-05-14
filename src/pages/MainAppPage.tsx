@@ -6,19 +6,15 @@ import {
   Settings,
   History,
   LogOut,
-  User,
-  Bell,
 } from "lucide-react";
 import OutlineTracer from "../components/OutlineTracer";
-import { useNavigate } from "react-router-dom";
+import NavBar from "@/components/Navbar";
 
 const MainAppPage = () => {
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
   const [svgUrl, setSvgUrl] = useState("");
   const [error, setError] = useState("");
-  const [notifications, setNotifications] = useState(2); // Example notification count
-  const navigate = useNavigate();
 
   const generateIcon = async () => {
     if (!prompt.trim()) return;
@@ -34,6 +30,7 @@ const MainAppPage = () => {
           headers: {
             "Content-Type": "application/json",
           },
+          credentials: "include",
           body: JSON.stringify({ userinput: prompt }),
         }
       );
@@ -48,25 +45,11 @@ const MainAppPage = () => {
     }
   };
 
-  // Mock user data
-  const user = {
-    name: "Alex Johnson",
-    avatar: "/api/placeholder/32/32",
-    plan: "Pro",
-  };
-
   return (
     <div className="flex h-screen bg-gray-900">
       {/* Sidebar */}
       <div className="w-64 bg-gray-800 border-r border-gray-700 flex flex-col">
-        <div className="p-4 flex items-center gap-3 border-b border-gray-700">
-          <Sparkles className="w-6 h-6 text-purple-400" />
-          <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400">
-            IconCraft AI
-          </h1>
-        </div>
-
-        <nav className="flex-1 p-4 space-y-2">
+        <nav className="flex-1 p-4 space-y-2 pt-20">
           <button className="flex items-center gap-3 text-white w-full p-2 rounded-lg hover:bg-purple-600/20 transition-colors">
             <Home className="w-5 h-5" />
             <span>Dashboard</span>
@@ -97,34 +80,12 @@ const MainAppPage = () => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div
+        className={`flex-1 flex flex-col overflow-hidden pt-16 transition-all duration-300`}
+      >
         {/* Top header */}
-        <header className="h-16 border-b border-gray-700 bg-gray-800 px-6 flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-white">Generate Icons</h2>
 
-          <div className="flex items-center gap-4">
-            <div className="relative">
-              <Bell className="w-6 h-6 text-gray-300 cursor-pointer hover:text-white transition-colors" />
-              {notifications > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-                  {notifications}
-                </span>
-              )}
-            </div>
-
-            <div className="flex items-center gap-3 cursor-pointer pl-4 border-l border-gray-700">
-              <img
-                src={user.avatar}
-                alt="User avatar"
-                className="w-8 h-8 rounded-full border border-purple-400"
-              />
-              <div>
-                <p className="text-sm font-medium text-white">{user.name}</p>
-                <p className="text-xs text-purple-400">{user.plan}</p>
-              </div>
-            </div>
-          </div>
-        </header>
+        <NavBar />
 
         {/* Content area */}
         <main className="flex-1 overflow-y-auto p-6">
